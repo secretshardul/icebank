@@ -1,0 +1,10 @@
+build
+.idea
+.coverage_map.mvcov
+.trace
+!.git/hooks/pre-commit
+storage
+target
+.aptos
+.DS_Store
+*.args
