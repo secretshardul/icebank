@@ -1,9 +1,9 @@
 [package]
-name = "IceBank"
+name = "Examples"
 version = "0.0.0"
 
 [dependencies]
 AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", subdir = "aptos-move/framework/aptos-framework/", rev = "devnet" }
 
 [addresses]
-IceBank = "0x42"
+IceBank = "0x0DD05C79F73E77E4D6D8218A08074829865018020A1CD93B3AEDF8E0D2B30766"
