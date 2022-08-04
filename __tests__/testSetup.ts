@@ -2,6 +2,8 @@ import anyTest, { TestFn } from 'ava'
 import { AptosClient, AptosAccount, FaucetClient, BCS, TxnBuilderTypes, HexString } from 'aptos'
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process'
 import waitPort from 'wait-port'
+import { readFileSync } from 'fs'
+import YAML from 'yaml'
 
 // devnet is used here for testing
 const NODE_URL = 'http://0.0.0.0:8080'
@@ -38,6 +40,7 @@ export async function publishModule (accountFrom: AptosAccount, moduleHex: strin
 }
 
 const test = anyTest as TestFn<{
+  account: string
 }>
 
 export default test
@@ -68,7 +71,15 @@ test.before(async t => {
     output: 'silent'
   })
 
+  // Read address and airdrop
+  const config = YAML.parse(readFileSync('.aptos/config.yaml', 'utf8'))
+  const account = config.profiles.default.account as string
+  await faucetClient.fundAccount(account, 1000)
+
   // Publish contract
+
+  // Setup context variables
+  t.context = { account }
 })
 
 test.after(async t => {
