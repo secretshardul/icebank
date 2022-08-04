@@ -1,5 +1,5 @@
-import test from 'ava'
+import test from './helper'
 
-test('hello world', t => {
+test('hello world', async t => {
   t.log('hello')
 })

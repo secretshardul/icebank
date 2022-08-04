@@ -29,14 +29,13 @@ https://aptos.dev/nodes/run-a-local-testnet/
 ```sh
 cd aptos-core
 
-# Localnet- http://0.0.0.0:8000
-CARGO_NET_GIT_FETCH_WITH_CLI=true cargo run -p aptos-node -- --test
+cargo install aptos-node aptos-faucet
 
-# Faucet- http://0.0.0.0:8000 (same)
-# Get `mint-key-file-path` from localnet logs > Aptos root key path
-cargo run --package aptos-faucet -- \
+aptos-node --test --test-dir .validator
+
+aptos-faucet \
   --chain-id TESTING \
-  --mint-key-file-path "/tmp/bdd949dc506aad86c90e2cd6c01e44dd/mint.key" \
+  --mint-key-file-path ".validator/mint.key" \
   --address 0.0.0.0 \
   --port 8000 \
   --server-url http://127.0.0.1:8080

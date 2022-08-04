@@ -8,6 +8,7 @@ target
 .aptos
 .DS_Store
 *.args
+.validator
 
 # Typescript SDK
 node_modules/
