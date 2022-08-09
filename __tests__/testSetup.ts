@@ -14,24 +14,33 @@ const client = new AptosClient(NODE_URL)
 const faucetClient = new FaucetClient(NODE_URL, FAUCET_URL)
 
 const test = anyTest as TestFn<{
-  account: AptosAccount
+  contract: AptosAccount,
+  alice: AptosAccount,
+  client: AptosClient,
+  faucetClient: FaucetClient,
 }>
 
 export default test
 
-let validator: ChildProcessWithoutNullStreams
-let faucet: ChildProcessWithoutNullStreams
+let validatorProcess: ChildProcessWithoutNullStreams
+let faucetProcess: ChildProcessWithoutNullStreams
 
 test.before(async t => {
   // Start validator and faucet
-  validator = spawn('aptos-node', ['--test', '--test-dir', '.validator'], { detached: true })
+  validatorProcess = spawn(
+    'aptos-node', [
+      '--test',
+      '--test-dir',
+      '.validator'
+    ], { detached: true }
+  )
   await waitPort({
     host: '0.0.0.0',
     port: 8080,
     output: 'silent'
   })
 
-  faucet = spawn('aptos-faucet', [
+  faucetProcess = spawn('aptos-faucet', [
     '--chain-id', 'TESTING',
     '--mint-key-file-path', '.validator/mint.key',
     '--address', '0.0.0.0',
@@ -50,23 +59,27 @@ test.before(async t => {
   const { account: accountKey, private_key: privateKey, public_key: publicKey } =
     config.profiles.default as WalletProfile
 
-  const account = AptosAccount.fromAptosAccountObject({
+  const contract = AptosAccount.fromAptosAccountObject({
     address: accountKey,
     publicKeyHex: publicKey,
     privateKeyHex: privateKey
   })
-  await faucetClient.fundAccount(accountKey, 1000)
+  await faucetClient.fundAccount(accountKey, 5000)
+
+  // Generates key pair for Alice
+  const alice = new AptosAccount()
+  await faucetClient.fundAccount(alice.address(), 1000)
 
   // Publish contract
   const moduleHex = readFileSync('build/Examples/bytecode_modules/UserInfo.mv').toString('hex')
-  const txHash = await publishModule(client, account, moduleHex)
+  const txHash = await publishModule(client, contract, moduleHex)
   await client.waitForTransaction(txHash)
 
   // Setup context variables
-  t.context = { account }
+  t.context = { contract, alice, client, faucetClient }
 })
 
 test.after(async t => {
-  validator.kill()
-  faucet.kill()
+  validatorProcess.kill()
+  faucetProcess.kill()
 })

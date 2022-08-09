@@ -5,8 +5,9 @@
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "scripts": {
-    "build": "rm -fr dist/ && rm -fr .validator && tsc -P tsconfig.build.json && tsc -P tsconfig.esm.json",
-    "test": "pnpm run build && ava",
+    "build": "aptos move compile",
+    "build:ts": "rm -fr dist/ && rm -fr .validator && tsc -P tsconfig.build.json && tsc -P tsconfig.esm.json",
+    "test": "pnpm run build:ts && ava",
     "lint": "eslint .  --ext .ts",
     "lint:fix": "eslint --fix .  --ext .ts"
   },
