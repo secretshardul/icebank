@@ -24,29 +24,11 @@ curl '0.0.0.0:8080/accounts/0x0DD05C79F73E77E4D6D8218A08074829865018020A1CD93B3A
 
 ## Localnet setup
 
-https://aptos.dev/nodes/run-a-local-testnet/
-
 ```sh
-cd aptos-core
+aptos node run-local-testnet --with-faucet
 
-cargo install aptos-node aptos-faucet
-
-aptos-node --test --test-dir .validator
-
-aptos-faucet \
-  --chain-id TESTING \
-  --mint-key-file-path ".validator/mint.key" \
-  --address 0.0.0.0 \
-  --port 8000 \
-  --server-url http://127.0.0.1:8080
-```
-
-Localnet publish issue
-
-```json
-{
-  "Error": "API error: error decoding response body: EOF while parsing a value at line 1 column 0"
-}
+# Read tx- transactions/by_hash in new update
+curl 'http://0.0.0.0:8080/transactions/0x19ab66e5545305d24af15f678b8f75b8e8d25f2b6a496e3ea82c7e142123481d'
 ```
 
 ## Useful tools

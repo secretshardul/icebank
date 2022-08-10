@@ -7,7 +7,7 @@
   "scripts": {
     "build": "aptos move compile",
     "build:ts": "rm -fr dist/ && rm -fr .validator && tsc -P tsconfig.build.json && tsc -P tsconfig.esm.json",
-    "test": "pnpm run build:ts && ava",
+    "test": "npm run build:ts && ava",
     "lint": "eslint .  --ext .ts",
     "lint:fix": "eslint --fix .  --ext .ts"
   },
@@ -35,7 +35,6 @@
     "wait-port": "^0.3.0",
     "yaml": "^2.1.1"
   },
-  "packageManager": "^pnpm@7.8.0",
   "dependencies": {
     "aptos": "^1.2.2"
   }

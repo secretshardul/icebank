@@ -8,7 +8,7 @@ import { publishModule, WalletProfile } from './testHelpers'
 
 // devnet is used here for testing
 const NODE_URL = 'http://0.0.0.0:8080'
-const FAUCET_URL = 'http://0.0.0.0:8000'
+const FAUCET_URL = 'http://0.0.0.0:8081'
 
 const client = new AptosClient(NODE_URL)
 const faucetClient = new FaucetClient(NODE_URL, FAUCET_URL)
@@ -23,48 +23,35 @@ const test = anyTest as TestFn<{
 export default test
 
 let validatorProcess: ChildProcessWithoutNullStreams
-let faucetProcess: ChildProcessWithoutNullStreams
 
 test.before(async t => {
   // Start validator and faucet
   validatorProcess = spawn(
-    'aptos-node', [
-      '--test',
-      '--test-dir',
-      '.validator'
+    'aptos', [
+      'node',
+      'run-local-testnet',
+      '--with-faucet'
     ], { detached: true }
   )
-  await waitPort({
-    host: '0.0.0.0',
-    port: 8080,
-    output: 'silent'
-  })
-
-  faucetProcess = spawn('aptos-faucet', [
-    '--chain-id', 'TESTING',
-    '--mint-key-file-path', '.validator/mint.key',
-    '--address', '0.0.0.0',
-    '--port', '8000',
-    '--server-url', 'http://127.0.0.1:8080'
-  ], { detached: true })
 
   await waitPort({
     host: '0.0.0.0',
-    port: 8000,
+    port: 8081,
     output: 'silent'
   })
 
-  // Read address and airdrop
+  // // Read address and airdrop
   const config = YAML.parse(readFileSync('.aptos/config.yaml', 'utf8'))
   const { account: accountKey, private_key: privateKey, public_key: publicKey } =
-    config.profiles.default as WalletProfile
+    config.profiles.local as WalletProfile
 
   const contract = AptosAccount.fromAptosAccountObject({
     address: accountKey,
     publicKeyHex: publicKey,
     privateKeyHex: privateKey
   })
-  await faucetClient.fundAccount(accountKey, 5000)
+
+  await faucetClient.fundAccount(accountKey, 10)
 
   // Generates key pair for Alice
   const alice = new AptosAccount()
@@ -81,5 +68,4 @@ test.before(async t => {
 
 test.after(async t => {
   validatorProcess.kill()
-  faucetProcess.kill()
 })
